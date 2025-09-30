@@ -13,6 +13,7 @@ myenv\Scripts\activate
 pip install -r requirements.txt
 
 -Chạy chương trình
+
 streamlit run app.py
 
 
