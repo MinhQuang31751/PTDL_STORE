@@ -11,6 +11,7 @@ myenv\Scripts\activate
 -Cài đặt các thư viện trong file requirements.txt
 
 pip install -r requirements.txt
+
 -Chạy chương trình
 streamlit run app.py
 
