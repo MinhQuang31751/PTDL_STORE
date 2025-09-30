@@ -2,11 +2,11 @@ Các bước chạy chương trình
 
 -Tạo môi trường ảo
 
-python -m venv myenv
+python -m venv penv
 
 -Kích hoạt môi trường ảo
 
-myenv\Scripts\activate
+penv\Scripts\activate
 
 -Cài đặt các thư viện trong file requirements.txt
 
