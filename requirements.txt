@@ -1,7 +1,3 @@
-langchain
-langchain-community
-langchain-openai
-langchain-experimental
 streamlit
 pandas
 matplotlib
@@ -12,7 +8,6 @@ jupyterlab
 tiktoken
 tabulate
 python-dotenv
-langchain-google-genai
 plotly
 scikit-learn
 streamlit-option-menu
