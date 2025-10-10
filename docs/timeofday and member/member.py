@@ -1,4 +1,7 @@
-# Tỷ lệ giao dịch từ hội viên
+import pandas as pd
+df = pd.read_csv('/content/convenience_store.csv')
+
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
