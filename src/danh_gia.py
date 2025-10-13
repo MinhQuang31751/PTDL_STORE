@@ -12,7 +12,7 @@ def show_overview():
 
     selected = option_menu(
         menu_title=None,
-        options=["Bảng dữ liệu chi tiết", "Thông tin về các cột", "Doanh thu theo địa chỉ cửa hàng", "Thống kê mô tả"],
+        options=["Bảng dữ liệu chi tiết", "Thông tin về các cột", "Liệt kê các sản phẩm"],
         icons=["table", "info-circle", "bar-chart", "clipboard-data"],
         menu_icon="cast",
         default_index=0,
@@ -21,9 +21,19 @@ def show_overview():
 
     if selected == "Bảng dữ liệu chi tiết":
         st.subheader("Bảng dữ liệu chi tiết")
+        if 'data' not in st.session_state:
+            st.error("Dữ liệu chưa được tải. Vui lòng tải dữ liệu trước.")
+            return
+        
         st.dataframe(st.session_state.data, width='stretch')
         total_rows = len(st.session_state.data)
-        st.write(f"**Số dòng dữ liệu (số lượng giao dịch):** {total_rows}")
+        st.write(f"**Số dòng dữ liệu:** {total_rows}")
+        
+        if 'TotalPrice' in st.session_state.data.columns:
+            total_revenue = st.session_state.data['TotalPrice'].sum()
+            st.write(f"**Tổng doanh thu:** ${total_revenue:,.2f}")
+        else:
+            st.warning("Không tìm thấy cột 'TotalPrice'. Vui lòng chuẩn hóa dữ liệu trước.")
 
     elif selected == "Thông tin về các cột":
         st.subheader("Thông tin về các cột")
@@ -42,32 +52,22 @@ def show_overview():
             })
             st.dataframe(column_info, width='stretch')
 
-    elif selected == "Doanh thu theo địa chỉ cửa hàng":
-        st.subheader("Doanh thu theo địa chỉ cửa hàng")
-        if 'City' in st.session_state.data.columns and 'Total_Cost' in st.session_state.data.columns:
-            sales_by_address = st.session_state.data.groupby('City')['Total_Cost'].sum().reset_index()
-            sales_by_address = sales_by_address.sort_values(by='Total_Cost', ascending=False)
-            st.write("**Doanh thu theo địa chỉ (tổng giảm dần):**")
-            st.dataframe(sales_by_address, width='stretch')
+    elif selected == "Liệt kê các sản phẩm":
+        st.subheader("Liệt kê các sản phẩm")
+        if 'data' not in st.session_state or st.session_state.data is None:
+            st.warning("Vui lòng tải lên file dữ liệu ở trang 'Dữ Liệu' trước khi xử lý.")
+            return
 
-            fig, ax = plt.subplots()
-            ax.pie(sales_by_address['Total_Cost'], labels=sales_by_address['City'], autopct='%1.1f%%', startangle=90, colors=['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'])
-            ax.axis('equal')
-            plt.title("Doanh Thu Theo Địa Chỉ Cửa Hàng")
-            st.pyplot(fig)
-        else:
-            st.error("Dữ liệu không chứa cột 'City' hoặc 'Total_Cost'.")
+        # Kiểm tra xem có cột Description không
+        if 'Description' not in st.session_state.data.columns:
+            st.error("Không tìm thấy cột 'Description' trong dữ liệu.")
+            return
 
-    elif selected == "Thống kê mô tả":
-        st.subheader("Thống kê mô tả")
-        if 'Total_Cost' in st.session_state.data.columns:
-            total_rows = len(st.session_state.data)
-            st.write(f"**Số lượng giao dịch:** {total_rows}")
-            total_revenue = st.session_state.data['Total_Cost'].sum()
-            st.write(f"**Tổng doanh thu:** ${total_revenue:,.2f}")
-        else:
-            st.error("Dữ liệu không chứa cột 'Total_Cost'.")
+        product_counts = st.session_state.data['Description'].value_counts().reset_index()
+        product_counts.columns = ['Sản phẩm', 'Số lượng bán']
+        st.dataframe(product_counts)
+    
 
+   
 if __name__ == "__main__":
     show_overview()
-    

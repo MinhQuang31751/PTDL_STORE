@@ -5,10 +5,13 @@ from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
 import importlib.util
 import sys
-
+import os
 from src.data_upload import upload_data
 from src.danh_gia import show_overview
 from src.data_processing import process_data
+
+# Dòng này từ Stashed changes (của bạn)
+os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
 
 def load_module_from_file(file_path, module_name):
     """Dynamically loads a module from a file path."""
@@ -40,8 +43,8 @@ def main():
     with st.sidebar:
         page = option_menu(
             "Menu chính",
-            ["Dữ Liệu", "Đánh Giá Tổng Quan", "Tiền Xử Lý Dữ Liệu", "Khai thác dữ liệu", "Model dự đoán"],
-            icons=["database", "bar-chart", "gear", "search", "cpu"],
+            ["Dữ Liệu", "Tiền Xử Lý Dữ Liệu", "Đánh Giá Tổng Quan", "Model dự đoán"],
+            icons=["database", "gear", "bar-chart", "cpu"],
             menu_icon="cast",
             default_index=0,
         )
@@ -52,22 +55,16 @@ def main():
     # Gọi chức năng upload dữ liệu khi ở trang Dữ Liệu
     if page == "Dữ Liệu":
         upload_data()
-    elif page == "Đánh Giá Tổng Quan":
-        show_overview()
+        
     elif page == "Tiền Xử Lý Dữ Liệu":  
         process_data()
-    elif page == "Khai thác dữ liệu":
-        try:
-            # Tải động module trực quan hóa
-            viz_module = load_module_from_file("src/4_Truc_quan_haa.py", "visualization_module")
-            # Gọi hàm chính từ module đã tải
-            viz_module.show_visualization_page()
-        except ImportError as e:
-            st.error(f"Lỗi khi tải trang khai thác dữ liệu: {e}")
-        except Exception as e:
-            st.error(f"Đã xảy ra lỗi không mong muốn: {e}")
+    
+        
+    elif page == "Đánh Giá Tổng Quan":
+        show_overview()
 
+    elif page == "Model dự đoán":
+        st.title("Model Dự Đoán Doanh Thu")
+        st.write("Phần này sẽ được phát triển trong tương lai.")
 if __name__ == "__main__":
     main()
-
-    
