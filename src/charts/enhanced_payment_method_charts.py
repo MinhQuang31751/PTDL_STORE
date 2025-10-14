@@ -120,9 +120,9 @@ def create_payment_method_time_trends(df: pd.DataFrame):
             df_temp = df.copy()
             df_temp['YearMonth'] = df_temp['InvoiceYear'].astype(str) + '-' + df_temp['InvoiceMonth'].astype(str).str.zfill(2) + '-01'
             df_temp['YearMonth'] = pd.to_datetime(df_temp['YearMonth'])
-            
+
             monthly_payment = df_temp.groupby(['YearMonth', 'Payment_Method']).size().reset_index(name='Count')
-            
+
             fig = px.line(
                 monthly_payment,
                 x='YearMonth',
@@ -131,7 +131,7 @@ def create_payment_method_time_trends(df: pd.DataFrame):
                 title='Xu hướng Sử dụng Phương thức Thanh toán theo Thời gian',
                 markers=True
             )
-            
+
             fig.update_layout(
                 xaxis_title="Thời gian",
                 yaxis_title="Số lượng Giao dịch",
@@ -157,7 +157,7 @@ def create_payment_method_time_trends(df: pd.DataFrame):
             barmode='group'
         )
         fig.update_layout(height=500)
-    
+
     return fig
 
 def create_payment_method_city_analysis(df: pd.DataFrame):

@@ -152,12 +152,9 @@ elif options["payment"]:
 
     with tab3:
         st.subheader("Phân tích Phân bố")
-        col1, col2 = st.columns(2)
 
-        with col1:
-            st.plotly_chart(create_payment_method_time_trends(df), use_container_width=True)
-        with col2:
-            st.plotly_chart(create_payment_method_city_analysis(df), use_container_width=True)
+        st.plotly_chart(create_payment_method_time_trends(df), use_container_width=True)
+        st.plotly_chart(create_payment_method_city_analysis(df), use_container_width=True)
 
     with tab4:
         st.subheader("Bảng Thống kê Chi tiết")
