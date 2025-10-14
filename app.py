@@ -9,7 +9,7 @@ import os
 from src.data_upload import upload_data
 from src.danh_gia import show_overview
 from src.data_processing import process_data
-
+# Bỏ from src.r import ... vì dùng load động
 # Dòng này từ Stashed changes (của bạn)
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
 
@@ -59,12 +59,16 @@ def main():
     elif page == "Tiền Xử Lý Dữ Liệu":  
         process_data()
     
-        
     elif page == "Đánh Giá Tổng Quan":
         show_overview()
 
     elif page == "Model dự đoán":
-        st.title("Model Dự Đoán Doanh Thu")
-        st.write("Phần này sẽ được phát triển trong tương lai.")
+        if st.session_state.data is None:
+            st.warning("Vui lòng upload và xử lý dữ liệu trước khi phân tích model!")
+        else:
+            # Load và gọi hàm từ r.py (sửa: truyền df làm arg, bỏ gán global)
+            r_module = load_module_from_file("src/rfm_and_pca.py", "r_module")
+            r_module.main(st.session_state.data)  # Gọi đúng với tham số df
+
 if __name__ == "__main__":
     main()
