@@ -1,7 +1,27 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
+
+# Original charts
 from src.charts.customer_category_charts import create_customer_category_pie_chart, create_customer_category_bar_chart, create_revenue_by_customer_category_bar_chart, create_customer_payment_method_grouped_bar_chart
 from src.charts.payment_method_charts import create_payment_method_pie_chart, create_payment_method_bar_chart, create_revenue_by_payment_method_bar_chart
+
+# Enhanced charts
+from src.charts.enhanced_customer_category_charts import (
+    create_customer_category_donut_chart, create_customer_spending_box_plot,
+    create_customer_loyalty_analysis, create_customer_seasonal_heatmap,
+    create_customer_average_metrics_radar, create_customer_promotion_response
+)
+from src.charts.enhanced_payment_method_charts import (
+    create_payment_method_enhanced_pie, create_payment_method_revenue_comparison,
+    create_payment_method_time_trends, create_payment_method_city_analysis,
+    create_payment_method_basket_analysis, create_payment_method_advanced_metrics
+)
+from src.charts.customer_payment_relationship_charts import (
+    create_customer_payment_correlation_heatmap, create_customer_payment_statistical_analysis,
+    create_customer_payment_spending_patterns, create_customer_payment_loyalty_matrix,
+    create_customer_payment_seasonal_trends, create_customer_payment_promotion_response,
+    create_customer_payment_comprehensive_dashboard
+)
 
 from src.time.timeofday_analysis import create_monthly_revenue_chart, display_revenue_stats
 from src.time.hoursofday_analysis import create_hourly_revenue_chart, display_hourly_stats
@@ -20,10 +40,11 @@ def create_sidebar_content():
                 "Phân tích theo TimeOfDay",
                 "Phân tích theo Customer",
                 "Phân tích theo Payment",
+                "Phân tích Mối quan hệ KH-TT",
                 "Phân tích theo Product",
                 "Phân tích theo Member"
             ],
-            icons=["clock", "person", "credit-card", "box", "people"],
+            icons=["clock", "person", "credit-card", "diagram-3", "box", "people"],
             menu_icon="cast",
             default_index=0
         )
@@ -34,6 +55,7 @@ def create_sidebar_content():
         "time_of_day": selected_option == "Phân tích theo TimeOfDay",
         "customer_category": selected_option == "Phân tích theo Customer",
         "payment": selected_option == "Phân tích theo Payment",
+        "relationship": selected_option == "Phân tích Mối quan hệ KH-TT",
         "product": selected_option == "Phân tích theo Product",
         "member": selected_option == "Phân tích theo Member"
     }
@@ -73,21 +95,107 @@ if options["time_of_day"]:
     st.plotly_chart(create_weekday_revenue_pie_chart(df), use_container_width=True)
 
 elif options["customer_category"]:
-    st.header("👥 Phân tích theo Phân khúc Khách hàng")
+    st.header("👥 Phân tích nâng cao theo Phân khúc Khách hàng")
 
-    # Display the charts for Customer Category
-    st.plotly_chart(create_customer_category_pie_chart(df), use_container_width=True)
-    st.plotly_chart(create_customer_category_bar_chart(df), use_container_width=True)
-    st.plotly_chart(create_revenue_by_customer_category_bar_chart(df), use_container_width=True)
-    st.plotly_chart(create_customer_payment_method_grouped_bar_chart(df), use_container_width=True)
+    # Create tabs for different analysis types
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Tổng quan", "💰 Chi tiêu", "🎯 Thành viên", "📈 Nâng cao"])
+
+    with tab1:
+        st.subheader("Phân bố và Tổng quan")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(create_customer_category_donut_chart(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_customer_category_bar_chart(df), use_container_width=True)
+
+        st.plotly_chart(create_revenue_by_customer_category_bar_chart(df), use_container_width=True)
+
+    with tab2:
+        st.subheader("Phân tích Chi tiêu")
+        st.plotly_chart(create_customer_spending_box_plot(df), use_container_width=True)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.plotly_chart(create_customer_seasonal_heatmap(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_customer_average_metrics_radar(df), use_container_width=True)
+
+    with tab3:
+        st.subheader("Phân tích Thành viên và Khuyến mãi")
+        st.plotly_chart(create_customer_loyalty_analysis(df), use_container_width=True)
+        st.plotly_chart(create_customer_promotion_response(df), use_container_width=True)
+
+    with tab4:
+        st.subheader("Biểu đồ Kết hợp")
+        st.plotly_chart(create_customer_payment_method_grouped_bar_chart(df), use_container_width=True)
 
 elif options["payment"]:
-    st.header("💳 Phân tích theo Phương thức Thanh toán")
+    st.header("💳 Phân tích nâng cao theo Phương thức Thanh toán")
 
-    # Display the charts for Payment Method
-    st.plotly_chart(create_payment_method_pie_chart(df), use_container_width=True)
-    st.plotly_chart(create_payment_method_bar_chart(df), use_container_width=True)
-    st.plotly_chart(create_revenue_by_payment_method_bar_chart(df), use_container_width=True)
+    # Create tabs for different analysis types
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Tổng quan", "📈 Doanh thu", "🌍 Phân bố", "📋 Chi tiết"])
+
+    with tab1:
+        st.subheader("Phân bố Phương thức Thanh toán")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(create_payment_method_enhanced_pie(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_payment_method_bar_chart(df), use_container_width=True)
+
+    with tab2:
+        st.subheader("Phân tích Doanh thu")
+        st.plotly_chart(create_payment_method_revenue_comparison(df), use_container_width=True)
+        st.plotly_chart(create_payment_method_basket_analysis(df), use_container_width=True)
+
+    with tab3:
+        st.subheader("Phân tích Phân bố")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(create_payment_method_time_trends(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_payment_method_city_analysis(df), use_container_width=True)
+
+    with tab4:
+        st.subheader("Bảng Thống kê Chi tiết")
+        st.plotly_chart(create_payment_method_advanced_metrics(df), use_container_width=True)
+
+elif options["relationship"]:
+    st.header("🔗 Phân tích Mối quan hệ Khách hàng - Phương thức Thanh toán")
+
+    # Create tabs for relationship analysis
+    tab1, tab2, tab3, tab4 = st.tabs(["🎯 Dashboard Tổng quan", "📊 Tương quan", "💡 Insights", "🌟 Nâng cao"])
+
+    with tab1:
+        st.subheader("Dashboard Tổng hợp")
+        st.plotly_chart(create_customer_payment_comprehensive_dashboard(df), use_container_width=True)
+
+    with tab2:
+        st.subheader("Phân tích Tương quan")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(create_customer_payment_correlation_heatmap(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_customer_payment_statistical_analysis(df), use_container_width=True)
+
+        st.plotly_chart(create_customer_payment_spending_patterns(df), use_container_width=True)
+
+    with tab3:
+        st.subheader("Insights và Patterns")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.plotly_chart(create_customer_payment_loyalty_matrix(df), use_container_width=True)
+        with col2:
+            st.plotly_chart(create_customer_payment_seasonal_trends(df), use_container_width=True)
+
+    with tab4:
+        st.subheader("Phân tích Khuyến mãi")
+        st.plotly_chart(create_customer_payment_promotion_response(df), use_container_width=True)
 
 elif options["product"]:
     st.header("📦 Phân tích theo Sản phẩm")
