@@ -172,23 +172,16 @@ elif options["relationship"]:
 
     with tab2:
         st.subheader("Phân tích Tương quan")
-        col1, col2 = st.columns(2)
 
-        with col1:
-            st.plotly_chart(create_customer_payment_correlation_heatmap(df), use_container_width=True)
-        with col2:
-            st.plotly_chart(create_customer_payment_statistical_analysis(df), use_container_width=True)
-
+        st.plotly_chart(create_customer_payment_correlation_heatmap(df), use_container_width=True)
+        st.plotly_chart(create_customer_payment_statistical_analysis(df), use_container_width=True)
         st.plotly_chart(create_customer_payment_spending_patterns(df), use_container_width=True)
 
     with tab3:
         st.subheader("Insights và Patterns")
-        col1, col2 = st.columns(2)
 
-        with col1:
-            st.plotly_chart(create_customer_payment_loyalty_matrix(df), use_container_width=True)
-        with col2:
-            st.plotly_chart(create_customer_payment_seasonal_trends(df), use_container_width=True)
+        st.plotly_chart(create_customer_payment_loyalty_matrix(df), use_container_width=True)
+        st.plotly_chart(create_customer_payment_seasonal_trends(df), use_container_width=True)
 
     with tab4:
         st.subheader("Phân tích Khuyến mãi")
