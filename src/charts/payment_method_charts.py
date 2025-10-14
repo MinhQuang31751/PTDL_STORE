@@ -14,3 +14,12 @@ def create_payment_method_bar_chart(df: pd.DataFrame):
 
     fig = px.bar(method_counts, x='Count', y='Payment_Method', orientation='h', title='Số lượng giao dịch theo phương thức thanh toán')
     return fig
+
+
+def create_revenue_by_payment_method_bar_chart(df: pd.DataFrame):
+    """Creates a bar chart for total revenue by Payment_Method."""
+    if 'Total_Cost' not in df.columns:
+        return None  # Or raise an error
+    revenue_by_method = df.groupby('Payment_Method')['Total_Cost'].sum().reset_index()
+    fig = px.bar(revenue_by_method, x='Payment_Method', y='Total_Cost', title='Tổng doanh thu theo phương thức thanh toán')
+    return fig

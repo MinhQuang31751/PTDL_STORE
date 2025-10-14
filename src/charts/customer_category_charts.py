@@ -14,3 +14,17 @@ def create_customer_category_bar_chart(df: pd.DataFrame):
 
     fig = px.bar(category_counts, x='Customer_Category', y='Count', title='Số lượng giao dịch theo nhóm khách hàng')
     return fig
+
+def create_revenue_by_customer_category_bar_chart(df: pd.DataFrame):
+    """Creates a bar chart for total revenue by Customer_Category."""
+    if 'Total_Cost' not in df.columns:
+        return None  # Or raise an error
+    revenue_by_category = df.groupby('Customer_Category')['Total_Cost'].sum().reset_index()
+    fig = px.bar(revenue_by_category, x='Customer_Category', y='Total_Cost', title='Tổng doanh thu theo nhóm khách hàng')
+    return fig
+
+def create_customer_payment_method_grouped_bar_chart(df: pd.DataFrame):
+    """Creates a grouped bar chart for Customer_Category and Payment_Method."""
+    grouped_data = df.groupby(['Customer_Category', 'Payment_Method']).size().reset_index(name='Count')
+    fig = px.bar(grouped_data, x='Customer_Category', y='Count', color='Payment_Method', barmode='group', title='Số lượng giao dịch theo Phương thức thanh toán và Nhóm khách hàng')
+    return fig

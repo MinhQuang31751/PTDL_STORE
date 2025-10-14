@@ -1,12 +1,13 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from src.charts.customer_category_charts import create_customer_category_pie_chart, create_customer_category_bar_chart
-from src.charts.payment_method_charts import create_payment_method_pie_chart, create_payment_method_bar_chart
+from src.charts.customer_category_charts import create_customer_category_pie_chart, create_customer_category_bar_chart, create_revenue_by_customer_category_bar_chart, create_customer_payment_method_grouped_bar_chart
+from src.charts.payment_method_charts import create_payment_method_pie_chart, create_payment_method_bar_chart, create_revenue_by_payment_method_bar_chart
 
 from src.time.timeofday_analysis import create_monthly_revenue_chart, display_revenue_stats
 from src.time.hoursofday_analysis import create_hourly_revenue_chart, display_hourly_stats
 from src.product.best_selling_products import top_product_analysis
 from src.time.dayofweek_analysis import create_weekday_revenue_bar_chart, create_weekday_revenue_pie_chart
+from src.data_preprocessing import get_processed_data
 
 
 def create_sidebar_content():
@@ -44,7 +45,11 @@ if 'data' not in st.session_state or st.session_state.data is None:
     st.warning("Vui lòng tải dữ liệu lên ở trang 'Dữ Liệu' trước.")
     st.stop()
 
-df = st.session_state.data
+# Lấy dữ liệu đã được xử lý
+df = get_processed_data()
+if df is None:
+    st.error("Không thể xử lý dữ liệu. Vui lòng kiểm tra lại file dữ liệu.")
+    st.stop()
 
 # Gọi hàm và lấy kết quả
 selected_option, options = create_sidebar_content()
@@ -57,7 +62,7 @@ st.write(f"**Đang xem:** {selected_option}")
 
 # Hiển thị nội dung tương ứng
 if options["time_of_day"]:
-    
+
     st.plotly_chart(create_monthly_revenue_chart(df), use_container_width=True)
     display_revenue_stats(df)
 
@@ -66,13 +71,15 @@ if options["time_of_day"]:
 
     st.plotly_chart(create_weekday_revenue_bar_chart(df), use_container_width=True)
     st.plotly_chart(create_weekday_revenue_pie_chart(df), use_container_width=True)
-    
+
 elif options["customer_category"]:
     st.header("👥 Phân tích theo Phân khúc Khách hàng")
 
     # Display the charts for Customer Category
     st.plotly_chart(create_customer_category_pie_chart(df), use_container_width=True)
     st.plotly_chart(create_customer_category_bar_chart(df), use_container_width=True)
+    st.plotly_chart(create_revenue_by_customer_category_bar_chart(df), use_container_width=True)
+    st.plotly_chart(create_customer_payment_method_grouped_bar_chart(df), use_container_width=True)
 
 elif options["payment"]:
     st.header("💳 Phân tích theo Phương thức Thanh toán")
@@ -80,6 +87,7 @@ elif options["payment"]:
     # Display the charts for Payment Method
     st.plotly_chart(create_payment_method_pie_chart(df), use_container_width=True)
     st.plotly_chart(create_payment_method_bar_chart(df), use_container_width=True)
+    st.plotly_chart(create_revenue_by_payment_method_bar_chart(df), use_container_width=True)
 
 elif options["product"]:
     st.header("📦 Phân tích theo Sản phẩm")
