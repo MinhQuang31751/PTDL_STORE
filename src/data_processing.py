@@ -71,9 +71,6 @@ def process_data():
             st.dataframe(st.session_state.data)
 
     
-
-
-
     elif selected == "Mã hóa và Tách cột":
         st.title("Mã hóa và Tách cột")
         if 'data' not in st.session_state or st.session_state.data is None:

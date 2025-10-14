@@ -98,13 +98,13 @@ def create_customer_average_metrics_radar(df: pd.DataFrame):
     """Radar chart comparing customer categories across multiple metrics"""
     metrics = df.groupby('Customer_Category').agg({
         'Total_Cost': 'mean',
-        'Total_Items': 'mean',
+        'Quantity': 'mean',
         'Member': lambda x: (x == 'Yes').mean() * 100  # Membership rate
     }).reset_index()
 
     # Normalize metrics for radar chart (0-100 scale)
     metrics['Avg_Spending_Norm'] = (metrics['Total_Cost'] / metrics['Total_Cost'].max()) * 100
-    metrics['Avg_Items_Norm'] = (metrics['Total_Items'] / metrics['Total_Items'].max()) * 100
+    metrics['Avg_Items_Norm'] = (metrics['Quantity'] / metrics['Quantity'].max()) * 100
     metrics['Member_Rate'] = metrics['Member']
 
     fig = go.Figure()

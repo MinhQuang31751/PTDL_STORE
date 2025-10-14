@@ -80,7 +80,7 @@ def create_customer_payment_spending_patterns(df: pd.DataFrame):
     """Advanced spending pattern analysis"""
     spending_patterns = df.groupby(['Customer_Category', 'Payment_Method']).agg({
         'Total_Cost': ['mean', 'std', 'count'],
-        'Total_Items': ['mean']
+        'Quantity': ['mean']
     }).round(2)
 
     spending_patterns.columns = ['Avg_Spending', 'Std_Spending', 'Transaction_Count', 'Avg_Items']

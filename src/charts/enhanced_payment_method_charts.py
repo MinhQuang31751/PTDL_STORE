@@ -177,7 +177,7 @@ def create_payment_method_city_analysis(df: pd.DataFrame):
 def create_payment_method_basket_analysis(df: pd.DataFrame):
     """Analysis of basket size and value by payment method"""
     basket_stats = df.groupby('Payment_Method').agg({
-        'Total_Items': ['mean', 'std'],
+        'Quantity': ['mean', 'std'],
         'Total_Cost': ['mean', 'std']
     }).round(2)
 
@@ -224,7 +224,7 @@ def create_payment_method_advanced_metrics(df: pd.DataFrame):
     """Advanced metrics dashboard for payment methods"""
     metrics = df.groupby('Payment_Method').agg({
         'Total_Cost': ['count', 'sum', 'mean', 'std'],
-        'Total_Items': ['mean'],
+        'Quantity': ['mean'],
         'Member': lambda x: (x == 'Yes').mean() * 100
     }).round(2)
 
