@@ -12,7 +12,14 @@ def create_customer_category_bar_chart(df: pd.DataFrame):
     category_counts = df['Customer_Category'].value_counts().reset_index()
     category_counts.columns = ['Customer_Category', 'Count']
 
-    fig = px.bar(category_counts, x='Customer_Category', y='Count', title='Số lượng giao dịch theo nhóm khách hàng')
+    fig = px.bar(
+        category_counts,
+        x='Customer_Category',
+        y='Count',
+        title='Số lượng giao dịch theo nhóm khách hàng',
+        color='Customer_Category',
+        color_discrete_sequence=px.colors.qualitative.Set2
+    )
     return fig
 
 def create_revenue_by_customer_category_bar_chart(df: pd.DataFrame):
@@ -20,7 +27,14 @@ def create_revenue_by_customer_category_bar_chart(df: pd.DataFrame):
     if 'Total_Cost' not in df.columns:
         return None  # Or raise an error
     revenue_by_category = df.groupby('Customer_Category')['Total_Cost'].sum().reset_index()
-    fig = px.bar(revenue_by_category, x='Customer_Category', y='Total_Cost', title='Tổng doanh thu theo nhóm khách hàng')
+    fig = px.bar(
+        revenue_by_category,
+        x='Customer_Category',
+        y='Total_Cost',
+        title='Tổng doanh thu theo nhóm khách hàng',
+        color='Customer_Category',
+        color_discrete_sequence=px.colors.qualitative.Vivid
+    )
     return fig
 
 def create_customer_payment_method_grouped_bar_chart(df: pd.DataFrame):

@@ -12,7 +12,15 @@ def create_payment_method_bar_chart(df: pd.DataFrame):
     method_counts = df['Payment_Method'].value_counts().reset_index()
     method_counts.columns = ['Payment_Method', 'Count']
 
-    fig = px.bar(method_counts, x='Count', y='Payment_Method', orientation='h', title='Số lượng giao dịch theo phương thức thanh toán')
+    fig = px.bar(
+        method_counts,
+        x='Count',
+        y='Payment_Method',
+        orientation='h',
+        title='Số lượng giao dịch theo phương thức thanh toán',
+        color='Payment_Method',
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
     return fig
 
 
