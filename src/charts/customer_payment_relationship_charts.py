@@ -43,11 +43,11 @@ def create_customer_payment_correlation_heatmap(df: pd.DataFrame):
 def create_customer_payment_statistical_analysis(df: pd.DataFrame):
     """Statistical analysis of customer-payment relationship"""
     contingency = pd.crosstab(df['Customer_Category'], df['Payment_Method'])
-    
+
     if SCIPY_AVAILABLE:
         # Chi-square test
         chi2, p_value, dof, expected = chi2_contingency(contingency)
-        
+
         # Calculate residuals (standardized)
         residuals = (contingency - expected) / np.sqrt(expected)
     else:
@@ -55,7 +55,7 @@ def create_customer_payment_statistical_analysis(df: pd.DataFrame):
         expected = contingency.sum(axis=1).values[:, np.newaxis] * contingency.sum(axis=0).values / contingency.sum().sum()
         residuals = (contingency - expected) / np.sqrt(expected + 1e-8)  # Add small value to avoid division by zero
         chi2, p_value = 0, 1
-    
+
     fig = px.imshow(
         residuals.values,
         labels=dict(x="Phương thức Thanh toán", y="Nhóm Khách hàng", color="Residual"),

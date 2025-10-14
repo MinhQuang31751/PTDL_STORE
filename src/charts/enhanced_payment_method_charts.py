@@ -113,28 +113,42 @@ def create_payment_method_revenue_comparison(df: pd.DataFrame):
 
 def create_payment_method_time_trends(df: pd.DataFrame):
     """Payment method usage trends over time"""
-    # Assuming we have processed data with date columns
+    # Check if we have processed data with date columns
     if 'InvoiceYear' in df.columns and 'InvoiceMonth' in df.columns:
-        df['YearMonth'] = pd.to_datetime(df[['InvoiceYear', 'InvoiceMonth']].assign(day=1))
-
-        monthly_payment = df.groupby(['YearMonth', 'Payment_Method']).size().reset_index(name='Count')
-
-        fig = px.line(
-            monthly_payment,
-            x='YearMonth',
-            y='Count',
-            color='Payment_Method',
-            title='Xu hướng Sử dụng Phương thức Thanh toán theo Thời gian',
-            markers=True
-        )
-
-        fig.update_layout(
-            xaxis_title="Thời gian",
-            yaxis_title="Số lượng Giao dịch",
-            height=500
-        )
+        try:
+            # Create YearMonth string first, then convert to datetime
+            df_temp = df.copy()
+            df_temp['YearMonth'] = df_temp['InvoiceYear'].astype(str) + '-' + df_temp['InvoiceMonth'].astype(str).str.zfill(2) + '-01'
+            df_temp['YearMonth'] = pd.to_datetime(df_temp['YearMonth'])
+            
+            monthly_payment = df_temp.groupby(['YearMonth', 'Payment_Method']).size().reset_index(name='Count')
+            
+            fig = px.line(
+                monthly_payment,
+                x='YearMonth',
+                y='Count',
+                color='Payment_Method',
+                title='Xu hướng Sử dụng Phương thức Thanh toán theo Thời gian',
+                markers=True
+            )
+            
+            fig.update_layout(
+                xaxis_title="Thời gian",
+                yaxis_title="Số lượng Giao dịch",
+                height=500
+            )
+        except Exception as e:
+            # If datetime conversion fails, fall back to simpler chart
+            fig = px.histogram(
+                df,
+                x='Customer_Category',
+                color='Payment_Method',
+                title='Phương thức Thanh toán theo Nhóm Khách hàng (Fallback)',
+                barmode='group'
+            )
+            fig.update_layout(height=500)
     else:
-        # Fallback: use day of week analysis
+        # Fallback: use customer category analysis
         fig = px.histogram(
             df,
             x='Customer_Category',
@@ -143,7 +157,7 @@ def create_payment_method_time_trends(df: pd.DataFrame):
             barmode='group'
         )
         fig.update_layout(height=500)
-
+    
     return fig
 
 def create_payment_method_city_analysis(df: pd.DataFrame):
