@@ -5,12 +5,19 @@ import pandas as pd
 import numpy as np
 
 def create_customer_category_donut_chart(df: pd.DataFrame):
-    """Enhanced donut chart with better styling and percentages"""
-    category_counts = df['Customer_Category'].value_counts()
-
+    """PHÂN BỐ KHÁCH HÀNG THEO ĐỘ TUỔI CHÍNH XÁC - ĐẾM KHÁCH HÀNG DUY NHẤT"""
+    
+    # BƯỚC 1: Lấy khách hàng DUY NHẤT
+    unique_customers = df[['CustomerID', 'Customer_Category']].drop_duplicates()
+    
+    # BƯỚC 2: Đếm số khách hàng theo nhóm
+    customer_counts = unique_customers['Customer_Category'].value_counts()
+    total_customers = len(unique_customers)  # Tổng khách hàng DUY NHẤT
+    
+    # BƯỚC 3: Tạo biểu đồ
     fig = go.Figure(data=[go.Pie(
-        labels=category_counts.index,
-        values=category_counts.values,
+        labels=customer_counts.index,
+        values=customer_counts.values,
         hole=0.4,
         textinfo='label+percent+value',
         textposition='auto',
@@ -20,18 +27,25 @@ def create_customer_category_donut_chart(df: pd.DataFrame):
         )
     )])
 
+    # CHỈ MỘT LẦN update_layout
     fig.update_layout(
         title={
-            'text': 'Phân bố Khách hàng theo Độ tuổi',
+            'text': 'PHÂN BỐ KHÁCH HÀNG THEO ĐỘ TUỔI<br><sub>Số lượng khách hàng duy nhất</sub>',
             'x': 0.5,
             'font': {'size': 16, 'family': 'Arial Black'}
         },
         showlegend=True,
         height=500,
-        annotations=[dict(text=f'Tổng<br>{len(df):,}<br>khách hàng',
-                         x=0.5, y=0.5, font_size=14, showarrow=False)]
+        annotations=[dict(
+            text=f'Tổng<br>{total_customers:,}<br>KHÁCH HÀNG',
+            x=0.5, y=0.5, 
+            font_size=14, 
+            showarrow=False,
+            font=dict(color='white', family='Arial')
+        )]
     )
-    return fig
+    
+    return fig 
 
 def create_customer_spending_box_plot(df: pd.DataFrame):
     """Box plot showing spending distribution by customer category"""

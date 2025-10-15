@@ -1,6 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-
+import importlib
+import importlib.util
+import sys
 # Original charts
 from src.charts.customer_category_charts import create_revenue_by_customer_category_bar_chart, create_customer_category_bar_chart
 from src.charts.payment_method_charts import create_payment_method_bar_chart
@@ -35,7 +37,7 @@ def create_sidebar_content():
                 "Phân tích theo Payment",
                 "Phân tích Mối quan hệ KH-TT",
                 "Phân tích theo Product",
-                "Phân tích theo Member"
+                "Phân loại nhóm khách hàng với RFM và PCA"
             ],
             icons=["clock", "person", "credit-card", "diagram-3", "box", "people"],
             menu_icon="cast",
@@ -50,11 +52,20 @@ def create_sidebar_content():
         "payment": selected_option == "Phân tích theo Payment",
         "relationship": selected_option == "Phân tích Mối quan hệ KH-TT",
         "product": selected_option == "Phân tích theo Product",
-        "member": selected_option == "Phân tích theo Member"
+        "rfm_pca": selected_option == "Phân loại nhóm khách hàng với RFM và PCA"
     }
 
     return selected_option, options
 
+def load_module_from_file(file_path, module_name):
+    """Dynamically loads a module from a file path."""
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load spec for module '{module_name}' at: {file_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
 # Kiểm tra dữ liệu trong session state
 if 'data' not in st.session_state or st.session_state.data is None:
     st.warning("Vui lòng tải dữ liệu lên ở trang 'Dữ Liệu' trước.")
@@ -183,6 +194,10 @@ elif options["product"]:
     st.write("Phân tích hiệu quả bán hàng theo danh mục sản phẩm...")
     top_product_analysis(df)
 
-elif options["member"]:
-    st.header("🛡️ Phân tích theo Thành viên")
-    st.write("Phân tích hành vi mua hàng của khách hàng thành viên...")
+elif options["rfm_pca"]:
+        if st.session_state.data is None:
+            st.warning("Vui lòng upload và xử lý dữ liệu trước khi phân tích model!")
+        else:
+            # Load và gọi hàm từ r.py (sửa: truyền df làm arg, bỏ gán global)
+            r_module = load_module_from_file("src/rfm_and_pca.py", "r_module")
+            r_module.main(st.session_state.data)  # Gọi đúng với tham số df

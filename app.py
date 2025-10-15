@@ -43,8 +43,8 @@ def main():
     with st.sidebar:
         page = option_menu(
             "Menu chính",
-            ["Dữ Liệu", "Tiền Xử Lý Dữ Liệu", "Đánh Giá Tổng Quan", "Model dự đoán"],
-            icons=["database", "gear", "bar-chart", "cpu"],
+            ["Dữ Liệu", "Tiền Xử Lý Dữ Liệu", "Đánh Giá Tổng Quan"],
+            icons=["database", "gear", "bar-chart"],
             menu_icon="cast",
             default_index=0,
         )
@@ -62,13 +62,7 @@ def main():
     elif page == "Đánh Giá Tổng Quan":
         show_overview()
 
-    elif page == "Model dự đoán":
-        if st.session_state.data is None:
-            st.warning("Vui lòng upload và xử lý dữ liệu trước khi phân tích model!")
-        else:
-            # Load và gọi hàm từ r.py (sửa: truyền df làm arg, bỏ gán global)
-            r_module = load_module_from_file("src/rfm_and_pca.py", "r_module")
-            r_module.main(st.session_state.data)  # Gọi đúng với tham số df
+    
 
 if __name__ == "__main__":
     main()

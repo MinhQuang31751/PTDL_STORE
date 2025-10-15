@@ -20,7 +20,7 @@ def main(df):
     rfm = df_clean.groupby('CustomerID').agg({
         'InvoiceDate': lambda x: (current_date - x.max()).days,  # Recency (thấp = tốt)
         'InvoiceNo': 'nunique',  # Frequency
-        'TotalPrice': 'sum'  # Monetary
+        'Total_Cost': 'sum'  # Monetary
     }).round(2)
     rfm.columns = ['Recency', 'Frequency', 'Monetary']
 

@@ -29,11 +29,11 @@ def show_overview():
         total_rows = len(st.session_state.data)
         st.write(f"**Số dòng dữ liệu:** {total_rows}")
         
-        if 'TotalPrice' in st.session_state.data.columns:
-            total_revenue = st.session_state.data['TotalPrice'].sum()
+        if 'Total_Cost' in st.session_state.data.columns:
+            total_revenue = st.session_state.data['Total_Cost'].sum()
             st.write(f"**Tổng doanh thu:** ${total_revenue:,.2f}")
         else:
-            st.warning("Không tìm thấy cột 'TotalPrice'. Vui lòng chuẩn hóa dữ liệu trước.")
+            st.warning("Không tìm thấy cột 'Total_Cost'. Vui lòng chuẩn hóa dữ liệu trước.")
 
     elif selected == "Thông tin về các cột":
         st.subheader("Thông tin về các cột")

@@ -20,41 +20,39 @@ def process_data():
         orientation="horizontal"
     )
 
-    # Xử lý theo lựa chọn
     if selected == "Xử lí giá trị bị thiếu và không hợp lệ":
         st.title("Xử lí giá trị bị thiếu và không hợp lệ")
         st.dataframe(st.session_state.data)
 
-        # Kiểm tra và thống kê giá trị null
-        null_counts = st.session_state.data.isnull().sum()
-        if null_counts.sum() == 0:
-            st.success("Không có giá trị null trong dữ liệu.")
-        else:
-            st.write("**Số lượng giá trị null theo cột:**")
-            st.dataframe(null_counts[null_counts > 0].to_frame(name='Số lượng null'))
-            null_percentage = (st.session_state.data.isnull().mean() * 100).round(2)
-            st.write("**Tỷ lệ phần trăm giá trị null theo cột:**")
-            st.dataframe(null_percentage[null_percentage > 0].to_frame(name='Tỷ lệ null (%)'))
+    # Kiểm tra và thống kê giá trị null
+    null_counts = st.session_state.data.isnull().sum()
+    if null_counts.sum() == 0:
+        st.success("Không có giá trị null trong dữ liệu.")
+    else:
+        st.write("**Số lượng giá trị null theo cột:**")
+        st.dataframe(null_counts[null_counts > 0].to_frame(name='Số lượng null'))
+        null_percentage = (st.session_state.data.isnull().mean() * 100).round(2)
+        st.write("**Tỷ lệ phần trăm giá trị null theo cột:**")
+        st.dataframe(null_percentage[null_percentage > 0].to_frame(name='Tỷ lệ null (%)'))
 
-            # Tùy chọn xử lý null
-            action = st.selectbox("Chọn phương pháp xử lý:", ["Không xử lý", "Xóa hàng có null", "Điền giá trị trung bình"])
-            if action == "Xóa hàng có null":
-                cleaned_data = st.session_state.data.dropna()
+        # Chọn cột bị null để xóa các phần tử null trong cột đó
+        columns_with_null = null_counts[null_counts > 0].index.tolist()
+        columns_to_clean = st.multiselect(
+            "Chọn cột bị null để xóa các phần tử null:",
+            options=columns_with_null,
+            default=[]
+        )
+    if st.button("Xóa các phần tử null đã chọn"):
+            if columns_to_clean:
+                original_len = len(st.session_state.data)
+                cleaned_data = st.session_state.data.dropna(subset=columns_to_clean)
                 st.session_state.data = cleaned_data
-                st.success(f"Đã xóa {len(st.session_state.data) - len(cleaned_data)} hàng có giá trị null.")
+                rows_dropped = original_len - len(cleaned_data)
+                st.success(f"Đã xóa {rows_dropped} hàng có giá trị null trong các cột: {', '.join(columns_to_clean)}")
                 st.dataframe(st.session_state.data)
-            elif action == "Điền giá trị trung bình":
-                numeric_columns = st.session_state.data.select_dtypes(include=['int64', 'float64']).columns
-                if not numeric_columns.empty:
-                    cleaned_data = st.session_state.data.copy()
-                    for col in numeric_columns:
-                        if cleaned_data[col].isnull().sum() > 0:
-                            cleaned_data[col] = cleaned_data[col].fillna(cleaned_data[col].mean())
-                    st.session_state.data = cleaned_data
-                    st.success("Đã điền giá trị trung bình cho các cột số.")
-                    st.dataframe(st.session_state.data)
-                else:
-                    st.error("Không có cột số để điền giá trị trung bình.")
+            else:
+                st.warning("Vui lòng chọn ít nhất một cột để xử lý.")
+
 
     elif selected == "Chuẩn hóa kiểu dữ liệu và tạo cột mới":
             st.title("Chuẩn hóa kiểu dữ liệu và tạo cột mới")
@@ -67,7 +65,7 @@ def process_data():
             # Xử lý tuần tự để tránh lặp lại
             
             
-            st.success("Đã tạo 5 cột mới: TotalPrice, InvoiceYear, InvoiceMonth, InvoiceDayName, InvoiceHour")
+            st.success("Đã tạo 5 cột mới: Total_Cost, InvoiceYear, InvoiceMonth, InvoiceDayName, InvoiceHour")
             st.dataframe(st.session_state.data)
 
     

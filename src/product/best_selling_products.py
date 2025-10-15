@@ -1,107 +1,113 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Thiết lập trang
-st.set_page_config(page_title="Top 10 Sản Phẩm Bán Chạy", layout="wide")
-
-# Tiêu đề
-st.title("10 SẢN PHẨM BÁN CHẠY NHẤT")
-st.subheader("(Dựa trên tổng doanh thu)")
+import plotly.express as px
 
 def top_product_analysis(df):
-    # Dictionary ánh xạ tên sản phẩm (bạn cần cập nhật đầy đủ)
-    product_translation_revenue = {
-        'WHITE HANGING HEART T-LIGHT HOLDER': {'name': 'Giá nén treo hình trái tim trắng', 'group': 'Trang trí'},
-        'JUMBO BAG RETROSPOT': {'name': 'Túi jumbo hoa tiết retro đồ', 'group': 'Túi & Bao bì'},
-        'ASSORTED COLOUR BIRD ORNAMENT': {'name': 'Vật trang trí chim nhiều màu', 'group': 'Trang trí'},
-        'PARTY BUNTING': {'name': 'Có trang trí tiệc', 'group': 'Trang trí tiệc'},
-        'POSTAGE': {'name': 'Phí vận chuyển', 'group': 'Khác'},
-        'RUSTIC WOODEN SLEIGH': {'name': 'Đèn ngủ hình thô', 'group': 'Đồ gia dụng'},
-        'RED HOTTIE WATER BOTTLE': {'name': 'Đèn trang trí hình ớt', 'group': 'Đồ gia dụng'},
-        'PAPER CHAIN KIT 50S CHRISTMAS': {'name': 'PAPER CHAIN KIT 50\'S CHRISTMAS', 'group': 'Trang trí tiệc'},
-        'PICNIC BASKET WICKER 60 PIECES': {'name': 'Gió dã ngoại máy 60 món', 'group': 'Khác'},
-        'REGENCY CAKESTAND 3 TIER': {'name': 'Giá bánh 3 tăng Regency', 'group': 'Đồ gia dụng'}
-    }
+    """
+    Phân tích sản phẩm bán hàng:
+    - Thống kê tổng quan
+    - Top 10 sản phẩm bán chạy nhất (tương tác)
+    - Top 10 sản phẩm bị hủy/trả lại nhiều nhất (tương tác)
+    """
 
-    # Lấy top 10 sản phẩm theo doanh thu
-    top_selling_revenue = df.groupby('Description')['TotalPrice'].sum().sort_values(ascending=False).head(10)
+    # Tiền xử lý cơ bản
+    df = df.copy()
+    df.columns = df.columns.str.strip()
 
-    # Tạo DataFrame mới với tên tiếng Việt và nhóm
-    top_revenue_df = pd.DataFrame({
-        'English_Name': top_selling_revenue.index,
-        'Total_Revenue': top_selling_revenue.values
-    })
+    if 'DoanhThu' not in df.columns:
+        df['DoanhThu'] = df['Quantity'] * df['UnitPrice']
 
-    # Hàm ánh xạ thông minh để xử lý khoảng trắng
-    def get_product_info_revenue(product_name):
-        # Chuẩn hóa tên sản phẩm (loại bỏ khoảng trắng thừa)
-        normalized_name = product_name.strip()
+    #Lọc các mô tả koophải sản phẩm 
+    exclude_keywords = r'manual|check|samples|discount|postage|damages|thrown away|test|unsaleable|\?'
+    filtered_df = df[~df['Description'].str.contains(exclude_keywords, case=False, na=False)]
 
-        # Thử tìm trong dictionary với tên đã chuẩn hóa
-        if normalized_name in product_translation_revenue:
-            return product_translation_revenue[normalized_name]
-        else:
-            # Nếu không tìm thấy, trả về thông tin mặc định
-            return {'name': normalized_name, 'group': 'Khác'}
+    #Thống kê tổng quan
+    total_products = filtered_df['Description'].nunique()
+    total_quantity = filtered_df['Quantity'].sum()
+    total_revenue = filtered_df['DoanhThu'].sum()
+    avg_price = filtered_df['UnitPrice'].mean()
 
-    # Thêm thông tin dịch và nhóm với xử lý lỗi
-    top_revenue_df['Vietnamese_Name'] = top_revenue_df['English_Name'].map(lambda x: get_product_info_revenue(x)['name'])
-    top_revenue_df['Product_Group'] = top_revenue_df['English_Name'].map(lambda x: get_product_info_revenue(x)['group'])
+    st.subheader("📈 Thống kê tổng quan về Sản phẩm")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Tổng số sản phẩm khác nhau", f"{total_products:,}")
+    col2.metric("Tổng số lượng bán ra", f"{total_quantity:,}")
+    col3.metric("Tổng doanh thu (ước tính)", f"£{total_revenue:,.2f}")
+    col4.metric("Giá trung bình", f"£{avg_price:,.2f}")
 
-    # Lọc bỏ POSTAGE (Phí vận chuyển) khỏi kết quả
-    top_revenue_df = top_revenue_df[top_revenue_df['Vietnamese_Name'] != 'Phí vận chuyển']
+    st.markdown("---")
 
-    # Kiểm tra xem có sản phẩm nào không được ánh xạ không
-    unmapped_products = top_revenue_df[top_revenue_df['Product_Group'] == 'Khác']
-    if len(unmapped_products) > 0:
-        st.warning("⚠️ Các sản phẩm chưa được ánh xạ:")
-        for product in unmapped_products['English_Name']:
-            st.write(f"   - '{product}'")
+    # Top 10 sản phẩm bán chạy nhất 
+    st.subheader("💰 Top 10 Sản Phẩm Bán Chạy Nhất (Theo Tổng Doanh Thu)")
 
-    # Tạo palette màu theo nhóm (đã bỏ Dịch vụ)
-    group_colors_revenue = {
-        'Đồ gia dụng': '#1f77b4',
-        'Trang trí': '#ff7f0e',
-        'Túi & Bao bì': '#2ca02c',
-        'Trang trí tiệc': '#d62728',
-        'Khác': '#7f7f7f'
-    }
-
-    # Vẽ biểu đồ
-    fig, ax = plt.subplots(figsize=(14, 8))
-
-    # Sắp xếp DataFrame theo doanh thu (tăng dần để hiển thị đúng trên biểu đồ ngang)
-    top_revenue_df_sorted = top_revenue_df.sort_values('Total_Revenue', ascending=True)
-
-    # Tạo biểu đồ
-    bars = ax.barh(
-        top_revenue_df_sorted['Vietnamese_Name'],
-        top_revenue_df_sorted['Total_Revenue'],
-        color=[group_colors_revenue[group] for group in top_revenue_df_sorted['Product_Group']]
+    product_revenue = (
+        filtered_df.groupby('Description', as_index=False)['DoanhThu']
+        .sum()
+        .sort_values(by='DoanhThu', ascending=False)
+        .head(10)
     )
 
-    ax.set_title('10 SẢN PHẨM BÁN CHẠY NHẤT\n(Dựa trên tổng doanh thu)', fontsize=16, fontweight='bold', pad=20)
-    ax.set_xlabel('Tổng Doanh thu (£)', fontsize=12, fontweight='bold')
-    ax.set_ylabel('')
+    fig1 = px.bar(
+        product_revenue,
+        x='DoanhThu',
+        y='Description',
+        orientation='h',
+        text='DoanhThu',
+        color='Description',
+        color_discrete_sequence=px.colors.qualitative.Bold,
+        title="Top 10 Sản Phẩm Bán Chạy Nhất (Theo Tổng Doanh Thu)"
+    )
 
-    # Thêm giá trị lên mỗi cột
-    for i, (value, group) in enumerate(zip(top_revenue_df_sorted['Total_Revenue'], top_revenue_df_sorted['Product_Group'])):
-        ax.text(value + 1000, i, f'£{value:,.0f}', va='center', fontsize=10, fontweight='bold')
+    fig1.update_traces(texttemplate='£%{text:,.0f}', textposition='outside')
+    fig1.update_layout(
+        yaxis=dict(categoryorder='total ascending'),
+        xaxis_title="Tổng Doanh Thu (£)",
+        yaxis_title="Tên Sản Phẩm",
+        showlegend=False,
+        height=600
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
-    # Tạo legend
-    legend_patches = [plt.Rectangle((0,0),1,1, color=color, label=group) 
-                    for group, color in group_colors_revenue.items()]
-    ax.legend(handles=legend_patches, title='Nhóm sản phẩm', title_fontsize=12, fontsize=11, loc='lower right')
+    #  Top 10 sản phẩm bị hủy/trả lại
+    st.subheader("🚫 Top 10 Sản Phẩm Bị Hủy/Trả Lại Nhiều Nhất")
 
-    # Loại bỏ đường viền
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.grid(axis='x', linestyle='--', alpha=0.7)
+    cancelled = filtered_df[filtered_df['Quantity'] < 0]
+    if cancelled.empty:
+        st.info("Không có sản phẩm nào bị hủy hoặc trả lại trong dữ liệu.")
+    else:
+        # dòng có Quantity < 0 được tính là 1 lần hủy trả
+        cancelled = cancelled.assign(CancelCount=1)
 
-    plt.tight_layout()
+        cancelled_products = (
+            cancelled.groupby('Description', as_index=False)['CancelCount']
+            .sum()
+            .sort_values(by='CancelCount', ascending=False)
+            .head(10)
+        )
 
-    # Hiển thị biểu đồ trong Streamlit
-    st.pyplot(fig)
+        fig2 = px.bar(
+            cancelled_products,
+            x='CancelCount',
+            y='Description',
+            orientation='h',
+            text='CancelCount',
+            color='Description',
+            color_discrete_sequence=px.colors.sequential.Reds,
+            title="Top 10 Sản Phẩm Bị Hủy/Trả Lại Nhiều Nhất"
+        )
+
+        fig2.update_traces(texttemplate='%{text}', textposition='outside')
+        fig2.update_layout(
+            yaxis=dict(categoryorder='total ascending'),
+            xaxis_title="Số lần bị hủy / trả lại",
+            yaxis_title="Tên Sản Phẩm",
+            showlegend=False,
+            height=600
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+
+        # Hiển thị bảng dữ liệu
+        with st.expander("📋 Xem bảng dữ liệu chi tiết"):
+            st.write("**Top 10 sản phẩm bán chạy nhất:**")
+            st.dataframe(product_revenue)
+            st.write("**Top 10 sản phẩm bị hủy/trả lại:**")
+            st.dataframe(cancelled_products)

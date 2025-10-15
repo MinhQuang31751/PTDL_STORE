@@ -178,7 +178,7 @@ def create_customer_payment_comprehensive_dashboard(df: pd.DataFrame):
         )
 
     fig.update_layout(
-        title=f'Tỷ lệ KH/Thanh toán (%)<br>Dashboard Tổng quan: {total_customers:,} giao dịch - Chi tiêu TB: {avg_spending:,.0f} VND',
+        title=f'Tỷ lệ KH/Thanh toán (%)<br>Dashboard Tổng quan: {total_customers:,} giao dịch - Chi tiêu TB: {avg_spending:,.0f} £',
         xaxis_title='Nhóm Khách hàng',
         yaxis_title='Tỷ lệ (%)',
         height=600,
