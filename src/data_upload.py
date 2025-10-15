@@ -44,12 +44,6 @@ def upload_data():
             st.session_state.data = df
             
             # Hiển thị thông báo thành công
-            st.success("Đã thêm cột Season vào dữ liệu!")
-            
-            # Hiển thị phân bố theo mùa
-            st.write("### Phân bố dữ liệu theo mùa:")
-            season_counts = df['Season'].value_counts()
-            st.write(season_counts)
             
             
             
