@@ -6,11 +6,11 @@ from streamlit_option_menu import option_menu
 import importlib.util
 import sys
 import os
+import base64
 from src.data_upload import upload_data
 from src.danh_gia import show_overview
 from src.data_processing import process_data
-# Bỏ from src.r import ... vì dùng load động
-# Dòng này từ Stashed changes (của bạn)
+
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
 
 def load_module_from_file(file_path, module_name):
@@ -31,13 +31,63 @@ def main():
         layout="wide",
     )
 
+    # BACKGROUND - ĐẶT ĐẦU TIÊN
+    if os.path.exists("anh.png"):
+        with open("anh.png", "rb") as f:
+            data = base64.b64encode(f.read()).decode()
+        
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/png;base64,{data}");
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }}
+            .main .block-container {{
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 10px;
+                padding: 2rem;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
     # Khởi tạo session state để lưu dữ liệu
     if 'data' not in st.session_state:
         st.session_state.data = None
 
     # Nạp file CSS
-    with open("static/styles.css", encoding='utf-8') as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open("static/styles.css", encoding='utf-8') as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except:
+        pass
+
+    # CSS CHO MENU - ĐẶT SAU BACKGROUND
+    st.markdown('''
+    <style>
+    /* Nền menu với gradient */
+    .css-1d391kg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0px 20px 20px 0px;
+    }
+
+    /* Màu chữ trong menu */
+    .css-1d391kg .css-1lcbmhc, 
+    .css-1d391kg .css-1v0mbdj {
+        color: white !important;
+    }
+
+    /* Hiệu ứng hover cho menu items */
+    .css-1d391kg .css-1lcbmhc:hover {
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 5px;
+    }
+    </style>
+    ''', unsafe_allow_html=True)
 
     # Thanh điều hướng bên trái với option_menu
     with st.sidebar:
@@ -61,8 +111,6 @@ def main():
     
     elif page == "Đánh Giá Tổng Quan":
         show_overview()
-
-    
 
 if __name__ == "__main__":
     main()

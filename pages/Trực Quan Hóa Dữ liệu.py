@@ -3,6 +3,8 @@ from streamlit_option_menu import option_menu
 import importlib
 import importlib.util
 import sys
+import os
+import base64
 # Original charts
 from src.charts.customer_category_charts import create_customer_category_bar_chart
 from src.charts.payment_method_charts import create_payment_method_bar_chart
@@ -23,6 +25,30 @@ from src.time.hoursofday_analysis import create_hourly_revenue_chart, display_ho
 from src.product.best_selling_products import top_product_analysis
 from src.time.dayofweek_analysis import create_weekday_revenue_bar_chart, create_weekday_revenue_pie_chart
 from src.data_preprocessing import get_processed_data
+
+
+if os.path.exists("anh.png"):
+    with open("anh.png", "rb") as f:
+        data = base64.b64encode(f.read()).decode()
+    
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{data}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        .main .block-container {{
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 2rem;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 def create_sidebar_content():
