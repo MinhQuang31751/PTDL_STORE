@@ -4,7 +4,7 @@ import importlib
 import importlib.util
 import sys
 # Original charts
-from src.charts.customer_category_charts import create_revenue_by_customer_category_bar_chart, create_customer_category_bar_chart
+from src.charts.customer_category_charts import create_customer_category_bar_chart
 from src.charts.payment_method_charts import create_payment_method_bar_chart
 
 # Enhanced charts
@@ -35,7 +35,6 @@ def create_sidebar_content():
                 "Phân tích theo TimeOfDay",
                 "Phân tích theo Customer",
                 "Phân tích theo Payment",
-                "Phân tích Mối quan hệ KH-TT",
                 "Phân tích theo Product",
                 "Phân loại nhóm khách hàng với RFM và PCA"
             ],
@@ -50,7 +49,6 @@ def create_sidebar_content():
         "time_of_day": selected_option == "Phân tích theo TimeOfDay",
         "customer_category": selected_option == "Phân tích theo Customer",
         "payment": selected_option == "Phân tích theo Payment",
-        "relationship": selected_option == "Phân tích Mối quan hệ KH-TT",
         "product": selected_option == "Phân tích theo Product",
         "rfm_pca": selected_option == "Phân loại nhóm khách hàng với RFM và PCA"
     }
@@ -112,7 +110,7 @@ elif options["customer_category"]:
     # with col2:
     st.plotly_chart(create_customer_category_bar_chart(df), use_container_width=True)
 
-    st.plotly_chart(create_revenue_by_customer_category_bar_chart(df), use_container_width=True)
+    st.plotly_chart(create_customer_payment_comprehensive_dashboard(df), use_container_width=True)
 
     # with tab2:
     #     st.subheader("Phân tích Chi tiêu")
@@ -162,15 +160,15 @@ elif options["payment"]:
     #     st.subheader("Bảng Thống kê Chi tiết")
     #     st.plotly_chart(create_payment_method_advanced_metrics(df), use_container_width=True)
 
-elif options["relationship"]:
-    st.header("🔗 Phân tích Mối quan hệ Khách hàng - Phương thức Thanh toán")
+# elif options["relationship"]:
+#     st.header("🔗 Phân tích Mối quan hệ Khách hàng - Phương thức Thanh toán")
 
     # Create tabs for relationship analysis
     # tab1, tab2, tab3, tab4 = st.tabs(["🎯 Dashboard Tổng quan", "📊 Tương quan", "💡 Insights", "🌟 Nâng cao"])
 
     # with tab1:
     # st.subheader("Dashboard Tổng hợp")
-    st.plotly_chart(create_customer_payment_comprehensive_dashboard(df), use_container_width=True)
+    # st.plotly_chart(create_customer_payment_comprehensive_dashboard(df), use_container_width=True)
 
     # with tab2:
     #     st.subheader("Phân tích Tương quan")
